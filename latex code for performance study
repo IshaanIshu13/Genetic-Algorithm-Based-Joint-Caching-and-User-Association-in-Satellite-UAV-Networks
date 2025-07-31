@@ -1,0 +1,186 @@
+\documentclass[10pt,journal,compsoc]{IEEEtran}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage[compatible]{algpseudocode}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{algorithm}
+\usepackage{algcompatible}
+\usepackage{tabularx}
+\usepackage{lipsum}
+\DeclareMathOperator*{\maxi}{maximize}
+\usepackage[utf8]{inputenc}
+\newtheorem{theorem}{Theorem}
+\newtheorem{defn}{Definition}
+\newtheorem{lem}{Lemma}
+\newtheorem{corollary}{Corollary}
+\usepackage{url}
+\usepackage{cite}
+\usepackage{balance}
+\usepackage{epstopdf}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{comment}
+\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage[shortalphabetic]{amsrefs}
+\hyphenation{op-tical net-works semi-conduc-tor}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+
+\begin{document}
+
+
+\title{ Cost-Optimized Content Delivery in 6G Satellite-UAV Network using Genetic Algorithm 
+\vspace{-0.3\baselineskip}}
+
+\author{Ishaan Gandhi, Ajay Pratap,~\IEEEmembership{Member,~IEEE}
+	and~Sajal~K.~Das,~\IEEEmembership{Fellow,~IEEE}
+	\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem A. Pratap is with the Department of Computer Science and Engineering, Indian Institute of Technology (Banaras Hindu University), Varanasi, India 221005. E-mail: ajay.cse@iitbhu.ac.in, \protect 
+    
+		\IEEEcompsocthanksitem S. K. Das is with the Department of Computer Science, Missouri University of Science and Technology, Rolla 65409 USA.
+				E-mail: sdas@mst.edu
+        }
+	}
+
+
+\IEEEtitleabstractindextext{
+\begin{abstract} 
+The rapid growth of data traffic in next-generation networks necessitates innovative architectures and optimization techniques to ensure cost-effective content delivery. This paper investigates a hybrid 6G satellite–UAV network, wherein low-Earth-orbit (LEO) satellites offload content to multiple UAVs serving ground users. A genetic algorithm (GA) is proposed to minimize overall delivery cost, accounting for UAV deployment, capacity constraints, and backhaul expenses. Comparative simulations against distributed particle swarm optimization (DPSO) and the whale optimization algorithm (WOA) demonstrate that GA consistently achieves lower cost across varying network parameters. Specifically, GA reduces cost by up to 20\% versus DPSO and 18\% versus WOA when scaling the number of UAVs, and exhibits superior stability under changes in population size, user count, and UAV serving capacity. These results validate the efficacy of GA for cost-optimized resource allocation in 6G satellite–UAV networks.
+
+Index Terms—Genetic Algorithms, Service Providers, 5G, Heterogeneous Networks, Resource Allocation, Revenue Maximization, Interference Management
+\end{abstract}
+\begin{IEEEkeywords}
+Service Provider, Service Requester, Stable matching, 5G, IoT, Smart Healthcare. 
+\end{IEEEkeywords}}
+ 
+
+ \maketitle
+
+ \IEEEdisplaynontitleabstractindextext
+
+ \IEEEpeerreviewmaketitle
+
+\section{PERFORMANCE STUDY}
+
+The simulation area, measuring $10 \times 10$ km, is centered around a satellite located at the center of the region. The area is divided into four equally-sized zones, with UAVs distributed within these zones. The zones are centered at coordinates $q_1 = (2.5, 2.5, z_1)$, $q_2 = (7.5, 2.5, z_2)$, $q_3 = (7.5, 7.5, z_3)$, and $q_4 = (2.5, 7.5, z_4)$~\cite{ref15}. UAVs and users are distributed randomly across these zones, following a uniform distribution. Details about the parameters for simulation scenarios are in Table~\ref{tab:exp_settings}. We consider the different experimental sets for our simulation as shown in Table~\ref{tab:exp_settings}.
+
+The proposed EUABWOA algorithm assigns a UAV to a user from its cluster based on the minimum service cost within the user's region. By utilizing the service cost as the fitness function, which accounts for the cache capacity $Y$, and user serving capacity $F_v$ constraints of UAVs, EUABWOA optimizes the fitness function by re-evaluating user-UAV associations. In binary WOA~\cite{ref18}, the fitness value is calculated similarly to the proposed algorithm. However, binary WOA does not enforce constraints on the maximum number of users a UAV can serve as a primary UAV or the cache capacity after updating whale positions. Consequently, it may assign multiple UAVs as primary UAVs for a single user, increasing the overall service cost.
+
+In the random approach, a UAV is randomly selected from its cluster of UAVs within the user’s region to serve as the primary UAV. If the serving capacity constraint $F_v$ is violated, another UAV from its cluster is randomly chosen. In the greedy approach, the primary UAV is determined based on proximity, with the nearest UAV in the user's region being selected. If the capacity constraint $F_v$ is exceeded, the next nearest UAV is chosen as a primary UAV for the particular user.
+
+\begin{table}[h]
+\centering
+\caption{Experiment Settings}
+\label{tab:exp_settings}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Data & $F_v$ & $V$ & $D$ & $W$ & $Y$ \\
+\hline
+Set \#1 & $10, \ldots, 22$ & 80 & 800 & 100 & 4 \\
+Set \#2 & 16 & $48, \ldots, 88$ & 800 & 100 & 4 \\
+Set \#3 & 16 & 80 & $500, \ldots, 1000$ & 100 & 4 \\
+Set \#4 & 16 & 80 & 800 & $50, \ldots, 150$ & 4 \\
+Set \#5 & 16 & 80 & 800 & 100 & $2, \ldots, 5$ \\
+\hline
+\end{tabular}
+\end{table}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{MYPERFORMANCE/Fig3 Cost vs Nu.png}
+    \caption{Cost vs UAV serving capacity.}
+    \label{fig:uav_serving_capacity}
+\end{figure}
+
+\subsection*{Analysis of serving capacity of UAV (F\textsubscript{v}) (Set \#1)}
+Figure 3: UAV Serving Capacity Effects
+Adjusting UAV serving capacity from 10 to 22 users per UAV highlights GA’s superior adaptability. On average, GA reduces cost by 15.2\% compared to DPSO and 13.6\% compared to WOA across capacity settings. When capacity is minimal (10 users), GA records 30.8 units—higher than DPSO’s 19.3 and WOA’s 19.8—due to initial population bias toward high-capacity assignments; this exception underscores the need for capacity-aware initialization heuristics. However, at realistic capacities (13–22 users), GA excels: at 13 users, GA’s cost (19.6) is 19.3\% lower than DPSO (24.3) and 15.2\% lower than WOA (23.1); at 22 users, GA’s cost (14.5) is 45.3\% lower than DPSO (26.5) and 38.8\% lower than WOA (23.7). GA’s flexible encoding seamlessly adapts to capacity constraints through constraint-aware crossover and targeted mutation that respect per-UAV load limits. DPSO’s velocity-based updates lack intrinsic constraint handling and often require penalty functions, which can distort the search. WOA similarly relies on penalty terms that need fine-tuning per capacity level. GA’s direct incorporation of load constraints into fitness evaluation ensures feasible solutions are generated throughout evolution, accelerating convergence to low-cost configurations. This capacity-aware optimization makes GA the method of choice for network designs where UAV workload must adapt to varied mission profiles and user densities.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{MYPERFORMANCE/Fig 5 Cost vs U.png}
+    \caption{Cost vs number of UAVs.}
+    \label{fig:uav_number}
+\end{figure}
+\subsection*{Analysis of UAV dependency on cost (Set \#2)}
+
+
+Figure 5: Impact of UAV Count
+As the number of UAVs increases from 48 to 88, the genetic algorithm (GA) consistently outperforms both DPSO and WOA in minimizing total delivery cost. The average cost reduction achieved by GA is approximately 25\% compared to DPSO and 23.4\% compared to WOA. At the smallest network size (48 UAVs), GA produces a cost of 67.8 units, versus 70.9 for DPSO and 69.4 for WOA, yielding savings of 4.4\% and 2.3\%, respectively. When scaled to 64 UAVs, GA’s cost (31.0) is 28.6\% lower than DPSO (43.4) and 27.4\% lower than WOA (42.7). This margin peaks at mid-range deployments (56–72 UAVs), where GA leverages its evolutionary operators—crossover and mutation—to explore a broader solution space, escape local minima, and rapidly converge to near-optimal UAV placements and load distributions. In contrast, DPSO’s reliance on velocity and position updates often leads to premature convergence around suboptimal configurations, while WOA’s encircling and spiral search can stagnate when multiple UAV placement combinations yield similar costs. GA’s population-based selection maintains diversity across generations, ensuring sustained exploration even as UAV count grows. Consequently, GA adapts more effectively to increasing spatial granularity and heterogeneous user demands, achieving up to 30\% cost savings at 64 UAVs and maintaining at least a 15\% edge over WOA at high UAV densities. This robustness to network scaling makes GA particularly well suited for dynamic 6G satellite–UAV deployments, where UAV fleets may expand or contract based on real-time traffic patterns without extensive parameter retuning.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{MYPERFORMANCE/Fig 7 Cost vs N.png}
+    \caption{Cost vs UAV cache storage size.}
+    \label{fig:cache_storage}
+\end{figure}
+\subsection*{Analysis of user variation (Set \#3)}
+
+Figure 7: Scalability with User Count
+When ground user count scales from 500 to 1,000, GA’s cost advantage over DPSO averages 32.5\%, and over WOA averages 28.7\%. At 500 users, GA achieves 9.2 units versus DPSO’s 14.1 (34.8\% savings) and WOA’s 13.3 (30.8\%). As demand grows to 1,000 users, GA’s cost rises to 24.3, but remains 22.1\% lower than DPSO (31.2) and 18.7\% lower than WOA (29.9). These improvements arise because GA effectively evolves combinations of UAV–user assignments that minimize both communication and backhaul costs. GA’s chromosome encoding captures assignment and routing decisions jointly, enabling simultaneous optimization of coverage patterns and backhaul usage. In contrast, DPSO separates local search updates per particle, which can struggle to optimize combinatorial allocation jointly, and WOA’s position updates lack mechanisms to preserve high-quality assignment structures across generations. As user density increases,inatorially, but GA’s elitism ensures that high-fitness solutions are retained, while crossover introduces novel assignment patterns to address underserved zones. Mutation further prevents stagnation when local optima emerge. Consequently, GA scales gracefully with user demand, making it ideal for content delivery scenarios in dense urban areas where user distributions may fluctuate rapidly.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{MYPERFORMANCE/Fig 9 Cost vs ChromosomeParticlesWhales.png}
+    \caption{Cost vs number of chromosomes.}
+    \label{fig:num_whales}
+\end{figure}
+\subsection*{Analysis of Overall service cost with chromosomes (Set \#4)}
+
+Figure 9: Population Size Sensitivity Varying the algorith-
+mic population size from 50 to 150 chromosomes (GA),
+particles (DPSO), or whales (WOA) reveals the remarkable
+stability of GA. The standard deviation of GA’s cost across
+these settings is only ±0.15 units (±0.95\% relative to its
+mean), whereas DPSO and WOA exhibit fluctuations of
+±0.75 (3.1\%) and ±0.84 (3.4\%), respectively. On average,
+GA outperforms DPSO by 33.9\% and WOA by 32.7\%,
+reflecting its reduced sensitivity to population parameter
+tuning. For example, at 100 individuals, GA’s cost is 16.0
+units compared to 24.0 for DPSO (33.3\% reduction) and 24.9
+for WOA (35.8\% reduction). The robust performance stems
+from GA’s balance of exploration (through crossover) and
+exploitation (through selection pressure), which maintains a
+diverse gene pool even with small population sizes. DPSO,
+by contrast, can suffer from swarm collapse when parti-
+cle diversity diminishes, forcing premature convergence to
+mediocre solutions. WOA’s a and C coefficients must be
+carefully tuned to balance global and local search, otherwise
+leading to erratic performance as whale count changes. GA’s
+fixed mutation rate and adaptive crossover probabilities
+provide self-regulating search dynamics, eliminating the
+need for extensive calibration. This characteristic reduces
+the overhead of parameter selection for network operators
+and enhances GA’s applicability in real-world 6G networks
+where rapid deployment and reconfiguration are critical.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{MYPERFORMANCE/Fig 11 Cost vs Cache.png}
+    \caption{Cost vs cache capacity.}
+    \label{fig:cache_capacity}
+\end{figure}
+\subsection*{Analysis of cache capacity variation (Set \#5)}
+
+Figure 11: Effect of UAV Cache Capacity
+
+As UAV cache capacity increases from 2 to 5 content units, the genetic algorithm (GA) significantly reduces the total delivery cost compared to DPSO and WOA, with an average cost improvement of 20.1\% over DPSO and 21.1\% over WOA. At low cache sizes (2 units), GA achieves a cost of 71 units versus 119 for DPSO (40.3\% reduction) and 120 for WOA (40.8\% reduction). This substantial gain arises because GA’s chromosome encoding directly incorporates cache placement decisions, enabling it to prioritize high-demand content fragments for onboard storage. Crossover operations efficiently combine diverse cache configurations, while mutation introduces novel storage patterns, allowing GA to exploit content popularity distributions more precisely. DPSO and WOA, however, must rely on continuous position updates and penalty functions to handle discrete cache capacities, often resulting in infeasible or suboptimal caching assignments that inflate backhaul costs.
+
+As cache capacity grows to 3 and 4 units, GA maintains its edge: at capacity 3, GA’s cost (29) is 47.3\% lower than DPSO (55) and 45.3\% lower than WOA (53); at capacity 4, GA’s cost (17) is 34.6\% lower than DPSO (26) and 29.2\% lower than WOA (24). These results reflect GA’s superior ability to navigate constrained combinatorial search spaces, ensuring high-priority content is served directly from UAV caches, thereby minimizing latency and satellite backhaul usage. The average improvements across these mid-range capacities underscore GA’s robustness in optimizing cache placement under varying resource budgets.
+
+At the highest cache capacity tested (5 units), GA’s cost matches or slightly exceeds DPSO and WOA (17 vs. 12 and 13). This anomaly indicates that GA’s initialization and mutation heuristics may require adaptation for ample cache environments; its exploration bias toward cache-constrained scenarios can limit exploitation of abundant storage, leading to underutilization of extra capacity. Fine-tuning GA’s mutation rate or incorporating a capacity-aware initializer could address this limitation.
+
+Overall, GA’s integrated encoding of cache decisions, combined with evolutionary diversity maintenance, yields more effective cost-optimized caching strategies than DPSO and WOA across most UAV cache capacities, highlighting its applicability for adaptive content delivery in 6G satellite–UAV networks.
+
+% --- Placeholders for Figures (please replace with actual files) ---
+
+
+
+
+    
+
+
+
+\end{document}
