@@ -2,7 +2,7 @@ import math
 import numpy as np
 import random
 
-# Constants
+# Constants----------------save
 beta = 2  #Path loss exponent
 nlos = 1
 nnlos = 20
@@ -19,8 +19,8 @@ M = 4
 F = 30
 #FOR ADDING HOVERING ENERGY
 Hv = 500       # UAV height in meters
-W = 5         # UAV weight in kg
-rd = 0.4       # Rotor disk radius in meters 
+W =  2.038  # convert to Newtons
+rd = 0.26       # Rotor disk radius in meters 
 
 file_size = 100 * 1024  # Assume 100 Kb file size
 tau = 0.0001 # sec
@@ -67,18 +67,17 @@ for _ in range(uavs_per_region):
 # Region 4 (Bottom-right): x in [5000, 10000], y in [0, 5000]
 for _ in range(uavs_per_region):
     uav_pos[3].append([np.random.randint(5000, 10001), np.random.randint(0, 5001), s_u])
-# ---------- Hovering Energy Function ----------
+# ---------- Hovering Energy Function ---------------------------------
   
-#okay
 def hovering_power(Hv, W, rd, c1=1.91, c2=1.1, xi0=1.225):
     xi = xi0 * np.exp(-1.18e-4 * Hv)
-    return c1 * xi + c2 * W*1.5 / (xi * np.pi * rd*2)
+    return (c1 * xi + c2 * W**1.5) /np.sqrt(xi * np.pi * rd**2)
 
 def hovering_energy(Hv, W, rd, duration):
     #print("hovering_energy() called with duration:", duration)  # Your added print
     return hovering_power(Hv, W, rd) * duration
 
-# ---------- Hovering Energy Function Ends----------
+# ---------- Hovering Energy Function Ends-----------------------------------
 
 
 # Function to calculate Euclidean distance
@@ -296,7 +295,7 @@ def calculate_energy_consumption(P_t, transmission_delay):
 freq_cpu = 3000000000 # in Hz
 cpu_cycles = 100 # cycle per bit
 
-# changeeeee
+# change for hover
 
 def assign_secondary_and_calculate(N, F, roh, Gamma, clusters, user_uav_data_rates, uav_uav_data_rates, sat_uav_data_rates, file_size, tau, phi):
     total_delay = np.zeros(N)
@@ -356,12 +355,11 @@ def assign_secondary_and_calculate(N, F, roh, Gamma, clusters, user_uav_data_rat
 
                     #change start
                     hover_energy_secondary_to_primary = hovering_energy(Hv, W, rd, delay_secondary_to_primary)
-                    hover_energy_primary_to_user = hovering_energy(Hv, W, rd, delay_primary_to_user)
+
                     energy_consumption = (receiving_energy +
                       transmission_energySectoPri +
                       calculate_energy_consumption(P_uav, delay_primary_to_user) +
-                      hover_energy_secondary_to_primary +
-                      hover_energy_primary_to_user)
+                      hover_energy_secondary_to_primary)
                     total_delay[user] = transmission_delay
                     total_energy[user] = energy_consumption
 
@@ -437,39 +435,39 @@ print(service_cost)
 total_service_cost = np.sum(service_cost)
 print(f"\nTotal Service Cost to Serve All Users: {total_service_cost} dollar")
 
-# Priority weight factors
-# priority_weights = {
-#     1: 1.0,  # Highest priority
-#     2: 1.2,  # High priority
-#     3: 1.5,  # Medium priority
-#     4: 2.0   # Low priority
-# }
-
-# Assign priorities to users
-# For simplicity, we'll randomly assign a priority to each user
-user_priorities = np.random.choice([1, 2, 3, 4], size=N)
-
-# Calculate service cost with priority factors
-def calculate_service_cost_with_priority(total_energy, phi):
-    #service_cost = np.zeros(N)
-    for user in range(N):
-        # priority = user_priorities[user]  # Get the user's priority
-        # omega = priority_weights[priority]  # Get the weight factor based on priority
-        service_cost[user] = total_energy[user] * phi
-    #print(f"User {user}: Priority {user_priorities[user]}, Service Cost: {service_cost_with_priority[user]}")
-    return service_cost
-
-# Calculate the service cost with the new priority factors
-service_cost_with_priority = calculate_service_cost_with_priority(total_energy, phi)
-
-# Print the service costs and the corresponding priorities
-#print("\nService Cost (with priority) for each user:")
-for user in range(N):
-    print(f"User {user}: Service Cost: {service_cost_with_priority[user]}")
-
-# Calculate total service cost for all users
-total_service_cost_with_priority = np.sum(service_cost_with_priority)
-print(f"\nTotal Service Cost to Serve All Users (with priority): {total_service_cost_with_priority} dollar")
+## Priority weight factors
+## priority_weights = {
+##     1: 1.0,  # Highest priority
+##     2: 1.2,  # High priority
+##     3: 1.5,  # Medium priority
+##     4: 2.0   # Low priority
+## }
+#
+## Assign priorities to users
+## For simplicity, we'll randomly assign a priority to each user
+#user_priorities = np.random.choice([1, 2, 3, 4], size=N)
+#
+## Calculate service cost with priority factors
+#def calculate_service_cost_with_priority(total_energy, phi):
+#    #service_cost = np.zeros(N)
+#    for user in range(N):
+#        # priority = user_priorities[user]  # Get the user's priority
+#        # omega = priority_weights[priority]  # Get the weight factor based on priority
+#        service_cost[user] = total_energy[user] * phi
+#    #print(f"User {user}: Priority {user_priorities[user]}, Service Cost: {service_cost_with_priority[user]}")
+#    return service_cost
+#
+## Calculate the service cost with the new priority factors
+#service_cost_with_priority = calculate_service_cost_with_priority(total_energy, phi)
+#
+## Print the service costs and the corresponding priorities
+##print("\nService Cost (with priority) for each user:")
+#for user in range(N):
+#    print(f"User {user}: Service Cost: {service_cost_with_priority[user]}")
+#
+## Calculate total service cost for all users
+#total_service_cost_with_priority = np.sum(service_cost_with_priority)
+#print(f"\nTotal Service Cost to Serve All Users (with priority): {total_service_cost_with_priority} dollar")
 
 def enforce_roh_constraints_after_toggle(roh, Nu, U, user_pos, uav_pos, uavs_per_region, user_uav_data_rates):
     # Initialize an array to count the number of primary users assigned to each UAV
@@ -520,34 +518,31 @@ def enforce_roh_constraints_after_toggle(roh, Nu, U, user_pos, uav_pos, uavs_per
 
     return roh
 
-    # ========== GENETIC ALGORITHM FOR CACHING OPTIMIZATION ==========
 
-    # GA Parameters
+
+
+# ========== GENETIC ALGORITHM FOR CACHING OPTIMIZATION ==========             
+# GA Parameters
 population_size = 10
 generations = 20
-mutation_rate = 0.1
-
+mutation_rate = 0.1            
 def initialize_population(pop_size, F, U, M):
-    return [generate_cache_matrix(F, U, M) for _ in range(pop_size)]
-
+    return [generate_cache_matrix(F, U, M) for _ in range(pop_size)]               
 def fitness_function(Gamma_candidate):
     # Reuse the existing clustering and roh structure
-
     delay, energy = assign_secondary_and_calculate(
         N, F, roh, Gamma_candidate, clusters, user_uav_data_rates,
         uav_uav_data_rates, sat_uav_data_rates, file_size, tau, phi
     )
     cost = np.sum(energy * phi)
-    return -cost  # Negative because we minimize cost
-
+    return -cost  # Negative because we minimize cost              
 def crossover(parent1, parent2):
     child = np.copy(parent1)
     for f in range(F):
         for u in range(U):
             if random.random() > 0.5:
                 child[f][u] = parent2[f][u]
-    return child
-
+    return child               
 def mutate(candidate, mutation_rate, M):
     for u in range(U):
         if random.random() < mutation_rate:
@@ -555,48 +550,37 @@ def mutate(candidate, mutation_rate, M):
             candidate[:, u] = 0
             files = np.random.choice(F, M, replace=False)
             candidate[files, u] = 1
-    return candidate
-
-
+    return candidate               
 # GA main loop
 population = initialize_population(population_size, F, U, M)
 best_fitness = float('-inf')
-best_solution = None
+best_solution = None               
 for gen in range(generations):
-    
     # Evaluate fitness
-
     fitness_scores = [fitness_function(ind) for ind in population]
-    ranked_population = [x for _, x in sorted(zip(fitness_scores, population), key=lambda pair: pair[0], reverse=True)]
+    ranked_population = [x for _, x in sorted(zip(fitness_scores, population), key=lambda pair: pair[0], reverse=True)]            
     # Elitism: retain top 2
-    new_population = ranked_population[:2]
-
+    new_population = ranked_population[:2]             
     # Generate rest via crossover and mutation
-
     while len(new_population) < population_size:
         parents = random.sample(ranked_population[:5], 2)
         child = crossover(parents[0], parents[1])
         child = mutate(child, mutation_rate, M)
-        new_population.append(child)
-    population = new_population
-
+        new_population.append(child)               
+    population = new_population            
     # Track best solution
-
     if max(fitness_scores) > best_fitness:
         best_fitness = max(fitness_scores)
-        best_solution = ranked_population[0]
-    print(f"Generation {gen+1}: Best Fitness = {-best_fitness:.2f} (lower is better)")
-
+        best_solution = ranked_population[0]               
+    print(f"Generation {gen+1}: Best Fitness = {-best_fitness:.2f} (lower is better)")             
 # Apply the best caching decision
-
 Gamma = best_solution
 print("\nBest Gamma (cache matrix) found by GA:")
-print(Gamma)
+print(Gamma)               
 # Recalculate final cost/delay
-
 final_delay, final_energy = assign_secondary_and_calculate(
     N, F, roh, Gamma, clusters, user_uav_data_rates,
     uav_uav_data_rates, sat_uav_data_rates, file_size, tau, phi
 )
 final_cost = np.sum(final_energy * phi)
-print(f"\nFinal Total Service Cost After GA Optimization: {final_cost:.2f} dollar")
+print(f"\nFinal Total Service Cost After GA Optimization: {final_cost:.2f} dollar")            
