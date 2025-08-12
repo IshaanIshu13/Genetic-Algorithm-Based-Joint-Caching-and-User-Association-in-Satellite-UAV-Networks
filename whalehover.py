@@ -2,7 +2,7 @@ import math
 import numpy as np
 import random
 
-# Constants
+# Constants------------------------------------------------
 beta = 2  #Path loss exponent
 nlos = 1
 nnlos = 20
@@ -19,8 +19,8 @@ M = 4
 F = 30
 #FOR ADDING HOVERING ENERGY
 Hv = 500       # UAV height in meters
-W = 5         # UAV weight in kg
-rd = 0.4       # Rotor disk radius in meters 
+W_UAV =  2.038  # weight of UAV in kgs
+rd = 0.26       # Rotor disk radius of UAV in meters 
 
 file_size = 100 * 1024  # Assume 100 Kb file size
 tau = 0.0001 # sec
@@ -67,18 +67,17 @@ for _ in range(uavs_per_region):
 # Region 4 (Bottom-right): x in [5000, 10000], y in [0, 5000]
 for _ in range(uavs_per_region):
     uav_pos[3].append([np.random.randint(5000, 10001), np.random.randint(0, 5001), s_u])
-# ---------- Hovering Energy Function ----------
+# ---------- Hovering Energy Function --------------------
   
-#okay
-def hovering_power(Hv, W, rd, c1=1.91, c2=1.1, xi0=1.225):
+def hovering_power(Hv, W_UAV, rd, c1=1.91, c2=1.1, xi0=1.225):
     xi = xi0 * np.exp(-1.18e-4 * Hv)
-    return c1 * xi + c2 * W*1.5 / (xi * np.pi * rd*2)
+    return (c1 * xi + c2 * W_UAV**1.5) /np.sqrt(xi * np.pi * rd**2)
 
-def hovering_energy(Hv, W, rd, duration):
+def hovering_energy(Hv, W_UAV, rd, duration):
     #print("hovering_energy() called with duration:", duration)  # Your added print
-    return hovering_power(Hv, W, rd) * duration
+    return hovering_power(Hv, W_UAV, rd) * duration
 
-# ---------- Hovering Energy Function Ends----------
+# ---------- Hovering Energy Function Ends-----------------
 
 
 # Function to calculate Euclidean distance
@@ -296,7 +295,7 @@ def calculate_energy_consumption(P_t, transmission_delay):
 freq_cpu = 3000000000 # in Hz
 cpu_cycles = 100 # cycle per bit
 
-# changeeeee
+# change for hover
 
 def assign_secondary_and_calculate(N, F, roh, Gamma, clusters, user_uav_data_rates, uav_uav_data_rates, sat_uav_data_rates, file_size, tau, phi):
     total_delay = np.zeros(N)
@@ -325,7 +324,7 @@ def assign_secondary_and_calculate(N, F, roh, Gamma, clusters, user_uav_data_rat
             transmission_delay = calculate_transmission_delay(file_size, data_rate_primary_user)
             # change start
             transmit_energy = calculate_energy_consumption(P_uav, transmission_delay)
-            hover_energy = hovering_energy(Hv, W, rd, transmission_delay)
+            hover_energy = hovering_energy(Hv, W_UAV, rd, transmission_delay)
             energy_consumption = transmit_energy + hover_energy
             total_delay[user] = transmission_delay
             total_energy[user] = energy_consumption
@@ -355,13 +354,12 @@ def assign_secondary_and_calculate(N, F, roh, Gamma, clusters, user_uav_data_rat
                     transmission_energySectoPri = calculate_energy_consumption(P_uav, delay_secondary_to_primary)
 
                     #change start
-                    hover_energy_secondary_to_primary = hovering_energy(Hv, W, rd, delay_secondary_to_primary)
-                    hover_energy_primary_to_user = hovering_energy(Hv, W, rd, delay_primary_to_user)
+                    hover_energy_secondary_to_primary = hovering_energy(Hv, W_UAV, rd, delay_secondary_to_primary)
+
                     energy_consumption = (receiving_energy +
                       transmission_energySectoPri +
                       calculate_energy_consumption(P_uav, delay_primary_to_user) +
-                      hover_energy_secondary_to_primary +
-                      hover_energy_primary_to_user)
+                      hover_energy_secondary_to_primary)
                     total_delay[user] = transmission_delay
                     total_energy[user] = energy_consumption
 
@@ -394,7 +392,7 @@ def assign_secondary_and_calculate(N, F, roh, Gamma, clusters, user_uav_data_rat
                 receive_energy = calculate_energy_consumption(P_uavr, delay_satellite_to_primary)
                 #change start
                 total_hover_time = delay_satellite_to_primary + delay_primary_to_user
-                hover_energy = hovering_energy(Hv, W, rd, total_hover_time)
+                hover_energy = hovering_energy(Hv, W_UAV, rd, total_hover_time)
 
                 energy_consumption = (calculate_energy_consumption(P_sat, delay_satellite_to_primary) +
                       receive_energy +
@@ -447,7 +445,7 @@ print(f"\nTotal Service Cost to Serve All Users: {total_service_cost} dollar")
 
 # Assign priorities to users
 # For simplicity, we'll randomly assign a priority to each user
-user_priorities = np.random.choice([1, 2, 3, 4], size=N)
+#user_priorities = np.random.choice([1, 2, 3, 4], size=N)
 
 # Calculate service cost with priority factors
 def calculate_service_cost_with_priority(total_energy, phi):
@@ -522,22 +520,19 @@ def enforce_roh_constraints_after_toggle(roh, Nu, U, user_pos, uav_pos, uavs_per
 
 
 
+
 #Function to initialize all whales
 def initialize_whales(num_whales, N, U, Nu, user_pos, uav_pos, uavs_per_region):
     whales = []
     for _ in range(num_whales):
         # Initialize an empty UAV-user association matrix (roh)
         roh = np.zeros((N, U))
-
         # Use the logic to assign primary UAVs for users
         roh = initialize_primary_uav(roh, user_pos, uav_pos, Nu, U, uavs_per_region)
-
         # Append the initialized whale as a dictionary with position and fitness
         whales.append({'position': roh, 'fitness': None})
     return whales
-
 Gamma = Gamma1
-
 # Function to calculate the total service cost with priority for a whale (roh matrix)
 def calculate_fitness_for_whale(roh, N, F, Gamma, clusters, user_uav_data_rates, uav_uav_data_rates, sat_uav_data_rates, file_size, tau, phi):
     # Calculate transmission delay and energy consumption for this whale
@@ -546,35 +541,27 @@ def calculate_fitness_for_whale(roh, N, F, Gamma, clusters, user_uav_data_rates,
     # print(total_delay)
     #print("\nEnergy Consumption (Joules) for each user:")
     #print(total_energy)
-
     # Calculate the service cost with priority for each user
-    service_cost_with_priority = calculate_service_cost_with_priority(total_energy, phi)
+    #service_cost = calculate_service_cost(total_energy, phi)
     # print("\nService Cost (with priority) for each user:")
     # for user in range(N):
     #     print(f"User {user}: Priority {user_priorities[user]}, Service Cost: {service_cost_with_priority[user]}")
-
     # Calculate total service cost as the fitness value for the whale
-    total_service_cost_with_priority = np.sum(service_cost_with_priority)
+    total_service_cost = np.sum(total_energy * phi)
     #print(f"\nTotal Service Cost to Serve All Users (with priority): {total_service_cost_with_priority} dollar")
-
-    return total_service_cost_with_priority
-
-
+    return total_service_cost#_with_priority
 # Parameters
 num_whales = 50
 iter = 1
 W = num_whales  # Whale population size
 I_max = 21  # Maximum iterations
-
 # Initialize whale population
 whales = initialize_whales(num_whales, N, U, Nu, user_pos, uav_pos, uavs_per_region)
-
 # Calculate fitness for each whale
 for whale in whales:
     whale['fitness'] = calculate_fitness_for_whale( whale['position'], N, F, Gamma, clusters,user_uav_data_rates, uav_uav_data_rates,sat_uav_data_rates, file_size, tau, phi
     )
     #print("Initial Whale fitness", whale['fitness'])
-
 # Find the best whale (minimum service cost)
 best_whale = min(whales, key=lambda x: x['fitness'])
 #last_best_fitness = best_whale['fitness']
@@ -600,18 +587,14 @@ while iter < I_max:
               H = abs((J * best_whale['position'] - whales[k]['position']))
               #print(H)
               sigma_sem = 1 / (1 + np.exp(-10 * (G * H - 0.5)))
-
               if(pBWOA < sigma_sem.all()):
                whales[k]['position'] = (1 - whales[k]['position'])
-
           else:
               random_whale = whales[random.randint(0, W - 1)]
               H = abs((J * random_whale['position'] - whales[k]['position']))
               sigma_sp = 1 / (1 + np.exp(-10 * (G * H - 0.5)))
-
               if(pBWOA < sigma_sp.all()):
                whales[k]['position'] = (1 - whales[k]['position'])
-
       else:
           H = abs((best_whale['position'] - whales[k]['position']))
           sigma_sup = 1 / (1 + np.exp(-10 * (G * H - 0.5)))
@@ -627,7 +610,6 @@ while iter < I_max:
       )
       #print("Whale fitness", whales[k]['fitness'])
       #print("whales[k]['position'] after enforcing constraint", whales[k]['position'])
-
   new_best_whale = min(whales, key=lambda x: x['fitness'])
   #print("new best whale", new_best_whale)
   if new_best_whale['fitness'] < last_best_fitness:
@@ -637,7 +619,6 @@ while iter < I_max:
     last_best_fitness = new_best_whale['fitness']  # Update last best fitness
     #print(f"Iteration {iter}, Best Fitness Last: {last_best_fitness}")
     #print(f"Iteration {iter}, Best Fitness Last: {best_whale['fitness']}")
-
   #print(last_best_fitness)
   #print(f"Iteration {iter}, Best Fitness Last: {new_best_whale}")
   # total_ones = np.sum(new_best_whale['position'])
@@ -645,8 +626,6 @@ while iter < I_max:
   print(f"Iteration {iter}, Best Fitness Last: {last_best_fitness}")
   #print(f"Iteration {iter}, Best Fitness Last: {best_whale['fitness']}")
   iter += 1
-
-
 #Output optimized service cost and user-UAV associations
 #Scost = last_best_fitness
 optimized_rho = best_whale['position']
